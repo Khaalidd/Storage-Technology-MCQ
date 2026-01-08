@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Storage Technology – Quiz</title>
+  <style>
+    :root{--bg:#f6f8fb;--card:#ffffff;--accent:#0b5cff;--muted:#6b7280;}
+    body{font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);margin:0;padding:24px;color:#0b1220}
+    .container{max-width:960px;margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:4px 0 20px;color:var(--muted)}
+    .card{background:var(--card);border-radius:12px;box-shadow:0 6px 18px rgba(12,24,48,0.06);padding:18px}
+    .q{padding:12px;border-radius:8px;margin-bottom:10px;border:1px solid #eef2ff}
+    .q h3{margin:0 0 8px;font-size:15px}
+    .opts{display:flex;flex-direction:column;gap:6px}
+    label.opt{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;cursor:pointer}
+    input[type=radio]{width:16px;height:16px}
+    .result{margin-top:14px;padding:12px;border-radius:8px;background:#f3f7ff;border:1px solid #dbe8ff}
+    .correct{background:#e6ffef;border-color:#b9f2d0}
+    .wrong{background:#fff0f0;border-color:#ffd2d2}
+    .score{font-weight:700;font-size:18px}
+    .controls{display:flex;gap:8px;align-items:center;margin-top:14px}
+    button{background:var(--accent);color:#fff;border:0;padding:10px 14px;border-radius:8px;cursor:pointer}
+    button.secondary{background:#f3f4f6;color:#0b1220}
+    .feedback{margin-top:12px}
+    small.hint{color:var(--muted)}
+    footer{margin-top:18px;color:#muted;font-size:13px}
+    @media (max-width:640px){body{padding:12px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Storage Technology</h1>
+        <p class="lead">Answer all questions then press <strong>Submit</strong></p>
+      </div>
+    </header>
+
+    <div class="card" id="quizCard">
+      <div id="quiz"></div>
+
+      <div class="controls">
+        <button id="submitBtn">Submit</button>
+        <button id="resetBtn" class="secondary" type="button">Reset</button>
+        <button id="shuffleBtn" class="secondary" type="button">Shuffle Questions</button>
+        <div style="margin-left:auto"><small class="hint">Questions: 99</small></div>
+      </div>
+
+      <div id="summary" class="feedback"></div>
+    </div>
+
+    <footer>All rights reserved to khaled :P happy new year</footer>
+  </div>
+
+<script>
+// Questions dataset from mcq-all.pdf
+const questions = [
+  // Lec1
+  {q: '1. Which of the following best defines information storage?', opts:[
+    'A) The method of transmitting data over the internet',
+    'B) The method of saving data for future access and management',
+    'C) The process of deleting unused data',
+    'D) The hardware only used for storing images'
+  ], ans:'B'},
+  {q: '2. Which of the following is an example of structured data?', opts:[
+    'A) Customer contact details in a database',
+    'B) A collection of scanned handwritten letters',
+    'C) Social media images and videos',
+    'D) Recorded phone calls'
+  ], ans:'A'},
+  {q: '3. Which factor has NOT contributed to the growth of digital data?', opts:[
+    'A) Increase in data processing capabilities',
+    'B) Decrease in storage costs',
+    'C) Affordable and faster communication technology',
+    'D) Reduction in the number of users generating data'
+  ], ans:'D'},
+  {q: '4. In a server-centric storage architecture:', opts:[
+    'A) Storage is centrally managed and independent of servers',
+    'B) Storage is internal to each server and not shareable',
+    'C) Data can be expanded dynamically without downtime',
+    'D) All information is automatically backed up in the cloud'
+  ], ans:'B'},
+  {q: '5. Which of the following is NOT a key challenge in managing information?', opts:[
+    'A) Explosive data growth',
+    'B) Accessibility and availability',
+    'C) High-quality and free internet access',
+    'D) Security, privacy, and compliance'
+  ], ans:'C'},
+  {q: '6. Which of the following is an example of unstructured data?', opts:[
+    'A) Employee records in a payroll database',
+    'B) Customer transaction logs in a DBMS',
+    'C) Email messages and video recordings',
+    'D) Inventory stored in relational tables'
+  ], ans:'C'},
+  {q: '7. Which storage type provides file-level access over LAN and is cost-effective for file sharing?', opts:[
+    'A) SAN',
+    'B) NAS',
+    'C) DAS',
+    'D) RAID'
+  ], ans:'B'},
+  {q: '8. Which of the following is the main characteristic of Big Data?', opts:[
+    'A) Limited capacity and slow processing',
+    'B) Requires traditional software tools only',
+    'C) Large volume, real-time analysis, diverse sources',
+    'D) Can only be structured data'
+  ], ans:'C'},
+  {q: '9. Which of the following is NOT a core element of a data center?', opts:[
+    'A) Application',
+    'B) Database (DBMS)',
+    'C) Storage Array',
+    'D) Web Browser'
+  ], ans:'D'},
+  {q: '10. Which of the following is a key challenge in managing enterprise information?', opts:[
+    'A) Explosive data growth',
+    'B) Accessibility and recovery requirements',
+    'C) Security, privacy, and compliance',
+    'D) All of the above'
+  ], ans:'D'},
+  {q: '11. Which of the following best explains virtualization?', opts:[
+    'A) A backup process to replicate files into the cloud',
+    'B) Technology that creates virtual versions of servers, storage, and networks',
+    'C) The process of deleting unused data from servers',
+    'D) A type of RAID configuration'
+  ], ans:'B'},
+  {q: '12. Which of the following is an example of server-centric storage limitations?', opts:[
+    'A) Dynamic expansion without downtime',
+    'B) Storage not shareable across servers',
+    'C) High scalability and centralized management',
+    'D) Easy disaster recovery'
+  ], ans:'B'},
+  {q: '13. Which of the following is a benefit of information-centric storage?', opts:[
+    'A) Storage is tied to a single server',
+    'B) Downtime occurs during upgrades',
+    'C) Centralized management and sharing across multiple servers',
+    'D) Data is stored without backup'
+  ], ans:'C'},
+  {q: '14. What is the main role of a Database Management System (DBMS) in data storage?', opts:[
+    'A) To manage hardware components of storage',
+    'B) To organize and manage structured data in tables',
+    'C) To monitor environmental conditions in a data center',
+    'D) To encrypt unstructured data'
+  ], ans:'B'},
+  {q: '15. Which of the following is an example of Big Data source?', opts:[
+    'A) Temperature readings from IoT devices',
+    'B) Business transaction logs',
+    'C) Social media posts and images',
+    'D) All of the above'
+  ], ans:'D'},
+  {q: '16. Which of the following statements about cloud computing is TRUE?', opts:[
+    'A) It eliminates the need for virtualization',
+    'B) It provides on-demand IT resources over the internet with pay-as-you-go pricing',
+    'C) It requires organizations to buy and maintain physical servers only',
+    'D) It is limited to storage services only'
+  ], ans:'B'},
+
+  // Lec2
+  {q: '17. ................... is built with NAND flash memory, much faster performance, durability (no moving parts), and energy efficiency compared to HDDs.', opts:[
+    'A) Magnetic Tapes',
+    'B) Punch Cards',
+    'C) Optical Storage',
+    'D) Solid-State Drives (SSDs)'
+  ], ans:'D'},
+  {q: '18. ............... are one of the most advanced storage technologies used today in data centers, enterprise systems, and personal computing.', opts:[
+    'A) Magnetic Tapes',
+    'B) Punch Cards',
+    'C) NVMe Drives',
+    'D) Optical Storage'
+  ], ans:'C'},
+  {q: '19. ................ is Small form-factor, non-volatile storage used in USB drives, smartphones, and embedded systems.', opts:[
+    'A) Flash Memory',
+    'B) Punch Cards',
+    'C) NVMe Drives',
+    'D) Optical Storage'
+  ], ans:'A'},
+  {q: '20. In data centers, applications are grouped into ...................', opts:[
+    'A) Business applications',
+    'B) Data protection',
+    'C) Security applications',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '21. .............. acts as a bridge between applications and storage, ensuring data is efficiently organized, retrieved, and managed.', opts:[
+    'A) NVMe Drives',
+    'B) Database management system',
+    'C) Server',
+    'D) Host'
+  ], ans:'B'},
+  {q: '22. ............... is the computer where applications run and data is stored/retrieved.', opts:[
+    'A) NVMe Drives',
+    'B) Database management system',
+    'C) Server',
+    'D) Host'
+  ], ans:'C'},
+  {q: '23. ............ is the link between hosts and peripheral devices (e.g., storage, printers).', opts:[
+    'A) Connectivity',
+    'B) Database management system',
+    'C) Server',
+    'D) Host'
+  ], ans:'A'},
+  {q: '24. .........is A set of paths enabling data transfer within a computer.', opts:[
+    'A) Connectivity',
+    'B) Database management system',
+    'C) Bus',
+    'D) Host'
+  ], ans:'C'},
+  {q: '25. ............. Specialized outlet for host-to-external device connectivity.', opts:[
+    'A) Port',
+    'B) Database management system',
+    'C) Bus',
+    'D) Host'
+  ], ans:'A'},
+  {q: '26. ............ Connect hosts to devices via copper or fiber.', opts:[
+    'A) Port',
+    'B) Cables',
+    'C) Bus',
+    'D) Host'
+  ], ans:'B'},
+  {q: '27. ................. is example of Logical Components of Connectivity.', opts:[
+    'A) PCI',
+    'B) SCSI',
+    'C) IDE/ATA',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '28. ................. is a circular disk inside a hard disk drive (HDD), coated with magnetic material on both sides to store data in binary form (0s and 1s).', opts:[
+    'A) Platter',
+    'B) Controller',
+    'C) Spindle',
+    'D) read/write head'
+  ], ans:'A'},
+  {q: '29. ............. holds and connects all platters in an HDD and is powered by a motor that spins them at constant high speeds.', opts:[
+    'A) Platter',
+    'B) Controller',
+    'C) Spindle',
+    'D) read/write head'
+  ], ans:'C'},
+  {q: '30. .................. holds the R/W heads and moves them to the correct position on the platter for reading or writing data.', opts:[
+    'A) Platter',
+    'B) Controller',
+    'C) Spindle',
+    'D) The actuator arm'
+  ], ans:'D'},
+  {q: '31. .................... is a circuit board at the bottom of the disk drive containing a microprocessor, memory, circuitry, and firmware.', opts:[
+    'A) Platter',
+    'B) Controller',
+    'C) Spindle',
+    'D) The actuator arm'
+  ], ans:'B'},
+  {q: '32. Disk storage is organized into ...............', opts:[
+    'A) Tracks',
+    'B) Sectors',
+    'C) Spindle',
+    'D) Cylinder'
+  ], ans:'A'},
+  {q: '33. Each track is divided into ..................., the smallest addressable storage unit.', opts:[
+    'A) Controllers',
+    'B) Sectors',
+    'C) Spindle',
+    'D) Cylinder'
+  ], ans:'B'},
+  {q: '34. ............... is the set of aligned tracks across all platter surfaces.', opts:[
+    'A) Controllers',
+    'B) Sectors',
+    'C) Spindle',
+    'D) Cylinder'
+  ], ans:'D'},
+  {q: '35. ....................... improves efficiency by dividing tracks into zones.', opts:[
+    'A) Controllers',
+    'B) Sectors',
+    'C) Spindle',
+    'D) Zoned Bit Recording (ZBR)'
+  ], ans:'D'},
+  {q: '36. ............... is the Time for the R/W head to move to the correct track.', opts:[
+    'A) Seek time',
+    'B) Rotation time',
+    'C) Data rate transfer',
+    'D) Zoned Bit Recording (ZBR)'
+  ], ans:'A'},
+  {q: '37. ............... is the Time for the platter to rotate the requested sector under the R/W head.', opts:[
+    'A) Seek time',
+    'B) Rotational time',
+    'C) Data rate transfer',
+    'D) Zoned Bit Recording (ZBR)'
+  ], ans:'B'},
+  {q: '38. Faster spindle speeds reduce Rotational time latency.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'A'},
+  {q: '39. Lower seek times improve random access performance.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'A'},
+  {q: '40. ................. is the average speed at which a disk drive delivers data to the Host Bus Adapter.', opts:[
+    'A) Seek time',
+    'B) Rotational time',
+    'C) Data rate transfer',
+    'D) Zoned Bit Recording (ZBR)'
+  ], ans:'C'},
+  {q: '41. ............ is a technology used in SATA disk drives to improve performance and efficiency by reordering commands for optimal execution.', opts:[
+    'A) Seek time',
+    'B) Rotational time',
+    'C) Native Command Queuing',
+    'D) Zoned Bit Recording (ZBR)'
+  ], ans:'C'},
+  {q: '42. ................ is a type of data storage that is attached directly to a computer without going through a network.', opts:[
+    'A) DAS',
+    'B) NAS',
+    'C) NCQ',
+    'D) SAN'
+  ], ans:'A'},
+  {q: '43. A typical USB flash drive includes ....................', opts:[
+    'A) USB connector',
+    'B) Mass storage controller',
+    'C) Crystal oscillator',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '44. The Key Characteristics of flash drive is .................', opts:[
+    'A) No Moving Parts',
+    'B) Interfaces',
+    'C) Non-volatile Memory Types',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '45. The Advantages of flash drive is .................', opts:[
+    'A) Faster data access',
+    'B) Lightweight',
+    'C) Compact, and portable',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '46. The Disadvantages of flash drive is .................', opts:[
+    'A) Higher cost per GB',
+    'B) Limited write/erase cycles',
+    'C) Data recovery is more complex',
+    'D) All of them'
+  ], ans:'D'},
+
+  // Lec3
+  {q: '47. ................ is implemented at the operating-system level and does not use a dedicated hardware controller to manage the RAID array.', opts:[
+    'A) Software RAID',
+    'B) Enclosures',
+    'C) Hardware RAID',
+    'D) Solid-State Drives'
+  ], ans:'A'},
+  {q: '48. The limitation of software RAID are ..................', opts:[
+    'A) Consumes host CPU resources',
+    'B) Limited advanced RAID features',
+    'C) Performance may degrade under heavy I/O',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '49. ................ handles all RAID functions (striping, mirroring, parity calculations), offloading work from the host CPU.', opts:[
+    'A) RAID Controller',
+    'B) Server',
+    'C) SSD',
+    'D) Hard disk'
+  ], ans:'A'},
+  {q: '50. Onboard RAID solutions are usually entry-level and lack because of ............................', opts:[
+    'A) Large cache memory',
+    'B) Advanced features (like RAID 6, RAID 50,..)',
+    'C) Battery backup units',
+    'D) All of them'
+  ], ans:'B'},
+  {q: '51. A dedicated RAID cards are essential because of .....................', opts:[
+    'A) Higher performance (offloads CPU)',
+    'B) Battery-backed cache improves write speed and reliability.',
+    'C) Supports advanced RAID levels (RAID 5, 6, 10, 50)',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '52. ................ is an enclosure that contains a number of HDDs and the supporting hardware and software to implement RAID.', opts:[
+    'A) RAID Array',
+    'B) RAID controller',
+    'C) Server',
+    'D) Host'
+  ], ans:'A'},
+  {q: '53. ........... are the methods used to organize data across disks, determine the data availability and performance characteristics of an array.', opts:[
+    'A) RAID Array',
+    'B) RAID Techniques',
+    'C) RAID Controller',
+    'D) Host'
+  ], ans:'B'},
+  {q: '54. A predefined number of contiguously addressable disk blocks in each disk are defined as........', opts:[
+    'A) Stripe',
+    'B) Strip size',
+    'C) Strips',
+    'D) RAID'
+  ], ans:'C'},
+  {q: '55. .......... improves I/O performance by spreading data across disks.', opts:[
+    'A) Mirroring',
+    'B) Striping',
+    'C) Parity',
+    'D) All of them'
+  ], ans:'B'},
+  {q: '56. .........is a technique whereby data is stored on two different HDDs, yielding two copies of data.', opts:[
+    'A) Mirroring',
+    'B) Striping',
+    'C) Parity',
+    'D) All of them'
+  ], ans:'A'},
+  {q: '57. ................. is a redundancy check that ensures full protection of data without maintaining a full set of duplicate data.', opts:[
+    'A) Mirroring',
+    'B) Striping',
+    'C) Parity',
+    'D) All of them'
+  ], ans:'C'},
+  {q: '58. In ............., Data is striped across all HDDs in the set.', opts:[
+    'A) RAID 0',
+    'B) RAID 4',
+    'C) RAID 1',
+    'D) RAID 5'
+  ], ans:'A'},
+  {q: '59. In .............., Data is mirrored across at least two HDDs', opts:[
+    'A) RAID 0',
+    'B) RAID 4',
+    'C) RAID 1',
+    'D) RAID 5'
+  ], ans:'C'},
+  {q: '60. ............. distributes parity across all disks, eliminating the single-disk bottleneck.', opts:[
+    'A) RAID 0',
+    'B) RAID 4',
+    'C) RAID 1',
+    'D) RAID 5'
+  ], ans:'D'},
+  {q: '61. ......... Uses two sets of distributed parity, allowing survival of two simultaneous disk failures.', opts:[
+    'A) RAID 0',
+    'B) RAID 4',
+    'C) RAID 1',
+    'D) RAID 6'
+  ], ans:'D'},
+  {q: '62. ........... temporarily replaces the failed disk and helps maintain data availability.', opts:[
+    'A) RAID',
+    'B) Hot Spares',
+    'C) RAID Controller',
+    'D) Host'
+  ], ans:'B'},
+
+  // Lec4
+  {q: '63. .............. is an advanced storage array that uses sophisticated software, cache management, and virtualization techniques.', opts:[
+    'A) RAID',
+    'B) Controller system',
+    'C) Intelligent Storage System',
+    'D) Server'
+  ], ans:'C'},
+  {q: '64. The Intelligent Storage System provides ..................', opts:[
+    'A) high performance',
+    'B) scalability and availability',
+    'C) automated data management',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '65. ................ connects the storage system to the host servers.', opts:[
+    'A) Front end',
+    'B) Cache',
+    'C) Back end',
+    'D) Hard disk'
+  ], ans:'A'},
+  {q: '66. ............ Execute appropriate transport protocols: SCSI, Fibre Channel, iSCSI.', opts:[
+    'A) Front-End Ports',
+    'B) Cache',
+    'C) Front-End Controllers',
+    'D) RAM'
+  ], ans:'A'},
+  {q: '67. .............. determines the execution order of received commands and can reduce unnecessary drive head movements and improve disk performance', opts:[
+    'A) Back-End',
+    'B) Front-End Command Queuing.',
+    'C) ISS',
+    'D) All of them'
+  ], ans:'B'},
+  {q: '68. ................ executes commands in received order.', opts:[
+    'A) Seek Time Optimization',
+    'B) Access Time Optimization',
+    'C) FIFO',
+    'D) Host'
+  ], ans:'C'},
+  {q: '69. ................ reorders commands to minimize head movement.', opts:[
+    'A) Seek Time Optimization',
+    'B) Access Time Optimization',
+    'C) FIFO',
+    'D) Host'
+  ], ans:'A'},
+  {q: '70. ................ Considers both seek time + rotational latency and provides the best performance.', opts:[
+    'A) Seek Time Optimization',
+    'B) Access Time Optimization',
+    'C) FIFO',
+    'D) Host'
+  ], ans:'B'},
+  {q: '71. .......... Cache is semiconductor memory where data is placed temporarily to reduce the time required to service I/O requests.', opts:[
+    'A) Front end',
+    'B) Cache',
+    'C) Back end',
+    'D) Hard disk'
+  ], ans:'B'},
+  {q: '72. .........indicates if cache data has been written (committed) to disk.', opts:[
+    'A) Last access time',
+    'B) Dirty bit flag',
+    'C) Tag RAM',
+    'D) All of them'
+  ], ans:'B'},
+  {q: '73. ............helps identify unused data to free up cache.', opts:[
+    'A) Last access time',
+    'B) Dirty bit flag',
+    'C) Tag RAM',
+    'D) All of them'
+  ], ans:'A'},
+  {q: '74. In ............., Data found in cache (via tag RAM).', opts:[
+    'A) Read Hit',
+    'B) Dirty bit flag',
+    'C) Read Miss',
+    'D) Tag RAM'
+  ], ans:'A'},
+  {q: '75. In .............., Data not in cache and Back-end controller fetches data from disk.', opts:[
+    'A) Read Hit',
+    'B) Dirty bit flag',
+    'C) Read Miss',
+    'D) Tag RAM'
+  ], ans:'C'},
+  {q: '76. In ............, Data is written to cache and immediately to disk, then acknowledgment is sent.', opts:[
+    'A) Write-Back Cache',
+    'B) Write-Around',
+    'C) Write-Through Cache',
+    'D) All of them'
+  ], ans:'C'},
+  {q: '77. In ........., Data is written to cache, acknowledgment sent to host, and later written (de-staged) to disk.', opts:[
+    'A) Write-Back Cache',
+    'B) Write-Around',
+    'C) Write-Through Cache',
+    'D) All of them'
+  ], ans:'A'},
+  {q: '78. In ..........., Memory is partitioned into one set for reads, another for writes.', opts:[
+    'A) Global Cache',
+    'B) Hot Spares',
+    'C) Dedicated Cache',
+    'D) Host'
+  ], ans:'C'},
+  {q: '79. In .........., A single pool of memory is shared by both reads and writes.', opts:[
+    'A) Global Cache',
+    'B) Hot Spares',
+    'C) Dedicated Cache',
+    'D) Host'
+  ], ans:'A'},
+  {q: '80. In ..............., Frees pages that haven’t been accessed for the longest time.', opts:[
+    'A) Most Recently Used (MRU)',
+    'B) Least Recently Used (LRU)',
+    'C) A and B',
+    'D) None of them'
+  ], ans:'B'},
+  {q: '81. In ................, Frees pages that were accessed most recently.', opts:[
+    'A) Most Recently Used (MRU)',
+    'B) Least Recently Used (LRU)',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'A'},
+  {q: '82. .......... is the process of moving data from a temporary fast storage to a permanent slower storage.', opts:[
+    'A) Cache Watermarking',
+    'B) Flushing',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'B'},
+  {q: '83. In ................, Writes are duplicated to two memory cards for redundancy.', opts:[
+    'A) Cache Mirroring',
+    'B) Flushing',
+    'C) Cache Vaulting',
+    'D) None of them'
+  ], ans:'A'},
+  {q: '84. In .............., Cache contents are safely dumped to vault drives during power loss.', opts:[
+    'A) Cache Mirroring',
+    'B) Flushing',
+    'C) Cache Vaulting',
+    'D) None of them'
+  ], ans:'C'},
+  {q: '85. ........... provides an interface between cache and the physical disks.', opts:[
+    'A) Front end',
+    'B) Cache',
+    'C) Back end',
+    'D) Hard disk'
+  ], ans:'C'},
+  {q: '86. ................... Is a logical volume created from physical drives or RAID-protected drive groups, presented to the host as if it were a physical disk.', opts:[
+    'A) Front end',
+    'B) Cache',
+    'C) LUN',
+    'D) Hard disk'
+  ], ans:'C'},
+  {q: '87. ............. Allocates the entire requested storage capacity upfront.', opts:[
+    'A) Traditional (Thick) Provisioning',
+    'B) Virtual (Thin) Provisioning',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'A'},
+  {q: '88. ............. Allocates storage on a just-in-time basis.', opts:[
+    'A) Traditional (Thick) Provisioning',
+    'B) Virtual (Thin) Provisioning',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'B'},
+  {q: '89. In ..............., I/Os performs to LUN through all available paths.', opts:[
+    'A) Midrange storage systems',
+    'B) High-end storage systems',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'B'},
+  {q: '90. In ..............., I/Os performs to LUN through active paths.', opts:[
+    'A) Midrange storage systems',
+    'B) High-end storage systems.',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'A'},
+
+  // Lec5
+  {q: '91. In.............., Hosts and storage connected via hubs.', opts:[
+    'A) Switched Fabric',
+    'B) IP-based SANs',
+    'C) FC-AL',
+    'D) FCIP'
+  ], ans:'C'},
+  {q: '92. In.................., FC switches replaced hubs', opts:[
+    'A) Switched Fabric',
+    'B) IP-based SANs',
+    'C) FC-AL',
+    'D) FCIP'
+  ], ans:'A'},
+  {q: '93. In ................,we interconnect remote/geographically separated SANs', opts:[
+    'A) Switched Fabric',
+    'B) IP-based SANs',
+    'C) FC-AL',
+    'D) FCIP'
+  ], ans:'D'},
+  {q: '94. In FC SAN, .......... used for short distances (up to 30m) in back-end connections', opts:[
+    'A) Copper cables',
+    'B) Optical fiber cables',
+    'C) Coaxial cable',
+    'D) Wire'
+  ], ans:'A'},
+  {q: '95. In FA SAN, ............ carry data as light signals and used in front end connections.', opts:[
+    'A) Copper cables',
+    'B) Optical fiber cables',
+    'C) Coaxial cable',
+    'D) Wire'
+  ], ans:'B'},
+  {q: '96. ............Are Larger, more powerful versions of FC switches and Used in enterprise / data center SANs.', opts:[
+    'A) Directors',
+    'B) switches',
+    'C) Hubs',
+    'D) Host'
+  ], ans:'A'},
+  {q: '97. ................ Is a Node port that used in Arbitrated Loop (FC-AL) topology..', opts:[
+    'A) NL_port',
+    'B) E_port',
+    'C) F_port',
+    'D) FL_port'
+  ], ans:'A'},
+  {q: '98. ................ Is a switch port that connects to an N_port.', opts:[
+    'A) NL_port',
+    'B) E_port',
+    'C) F_port',
+    'D) FL_port'
+  ], ans:'C'},
+  {q: '99. .......... Is a Switch port that connects to NL_ports in an FC-AL loop', opts:[
+    'A) N_port',
+    'B) E_port',
+    'C) F_port',
+    'D) FL_port'
+  ], ans:'D'},
+  {q: '100. .........is a Port that connects two switches.', opts:[
+    'A) N_port',
+    'B) E_port',
+    'C) F_port',
+    'D) FL_port'
+  ], ans:'B'},
+  {q: '101. ............is the basic elements (hosts, storage ports, or WWNs.', opts:[
+    'A) Members',
+    'B) Zone Set',
+    'C) Zones',
+    'D) All of them'
+  ], ans:'A'},
+  {q: '102. ............. is an FC switch function that enables nodes within the fabric to be logically segmented into groups that can communicate with each other.', opts:[
+    'A) Members',
+    'B) Zone Set',
+    'C) Zoning',
+    'D) All of them'
+  ], ans:'C'},
+  {q: '103. In........., Every switch is directly connected to every other switch in the fabric.', opts:[
+    'A) mesh topology',
+    'B) partial mesh topology',
+    'C) Core-Edge topology',
+    'D) Star topology'
+  ], ans:'A'},
+  {q: '104. In ........., several hops or ISLs may be required for the traffic to reach its destination.', opts:[
+    'A) mesh topology',
+    'B) partial mesh topology',
+    'C) Core-Edge topology',
+    'D) Star topology'
+  ], ans:'B'},
+
+  // Lec6
+  {q: '105. NAS uses protocols such as ...............', opts:[
+    'A) TCP/IP',
+    'B) NFS',
+    'C) CIFS',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '106. A NAS device is optimized for file-serving tasks such as storing, retrieving, and accessing files for applications and clients.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'A'},
+  {q: '107. NAS is dedicated solely to block services, running a real-time operating system tailored for block-serving using open-standard protocols.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'B'},
+  {q: '108. In NAS, the file transfer speed is not fast as DAS.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'A'},
+  {q: '109. The NAS operating system translates file I/O requests into block I/O on the storage media, retrieves the data, and converts it back to file-level I/O for clients.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'A'},
+  {q: '110. In NAS, ............ is a structured way of storing and organizing data files.', opts:[
+    'A) File system',
+    'B) Block system',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'A'},
+  {q: '111. .............. Creates a link between the file system and the operating system.', opts:[
+    'A) Mounting',
+    'B) Directories',
+    'C) Subdirectories',
+    'D) Node'
+  ], ans:'A'},
+  {q: '112. In NAS, ............. adds encryption for secure file transfer.', opts:[
+    'A) FTP',
+    'B) SFTP',
+    'C) IP',
+    'D) HTTP'
+  ], ans:'B'},
+  {q: '113. In NAS, ............ Provide connectivity between NAS and the IP network', opts:[
+    'A) NICs',
+    'B) HTTP',
+    'C) FC',
+    'D) FTP'
+  ], ans:'A'},
+  {q: '114. In NAS, File-Sharing Protocols is ................. for UNIX/Linux clients.', opts:[
+    'A) FTP',
+    'B) NFS',
+    'C) CIFS',
+    'D) FC'
+  ], ans:'B'},
+  {q: '115. In NAS, File-Sharing Protocols is ................. for Windows clients.', opts:[
+    'A) FTP',
+    'B) NFS',
+    'C) CIFS',
+    'D) FC'
+  ], ans:'C'},
+  {q: '116. ............. Is a self-contained system : NAS head, storage , and OS — all in one chassis', opts:[
+    'A) Integrated NAS',
+    'B) Gateway NAS',
+    'C) NIC',
+    'D) All of them'
+  ], ans:'A'},
+  {q: '117. In........., NAS Head connected to a SAN backend.', opts:[
+    'A) Integrated NAS',
+    'B) Gateway NAS',
+    'C) NIC',
+    'D) All of them'
+  ], ans:'B'},
+  {q: '118. In NAS, ............... abstracts (hides) the physical location of files from users and applications.', opts:[
+    'A) Traditional File Access',
+    'B) File-level virtualization',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'B'},
+
+  // Lec7
+  {q: '119. The cloud vendor of file storage is ...............', opts:[
+    'A) Amazon EFS',
+    'B) AWS EBS',
+    'C) Amazon S3',
+    'D) All of them'
+  ], ans:'A'},
+  {q: '120. The cloud vendor of block storage is ............ .', opts:[
+    'A) Amazon EFS',
+    'B) AWS EBS',
+    'C) Amazon S3',
+    'D) All of them'
+  ], ans:'B'},
+  {q: '121. The cloud vendor of object storage is .............', opts:[
+    'A) Amazon EFS',
+    'B) AWS EBS',
+    'C) Amazon S3',
+    'D) All of them'
+  ], ans:'C'},
+  {q: '122. Hierarchical file system organizes data in the form of files and directories.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'A'},
+  {q: '123. Cloud-based Storage is a Public and private cloud providers such as..............', opts:[
+    'A) Amazon S3',
+    'B) Microsoft Azure Blob Storage',
+    'C) Google Cloud Storage',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '124. In OSD, the metadata is the actual content.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'B'},
+  {q: '125. The Access Protocols of OSD is .............', opts:[
+    'A) NFS',
+    'B) iSCSI',
+    'C) RESTful APIs',
+    'D) SMB'
+  ], ans:'C'},
+  {q: '126. Object-based Storage Model is best for ...............', opts:[
+    'A) Databases',
+    'B) unstructured data',
+    'C) OS storage',
+    'D) structured data'
+  ], ans:'B'},
+  {q: '127. OSD nodes are responsible for................ across the system to ensure reliability', opts:[
+    'A) replication',
+    'B) recovery',
+    'C) data distribution',
+    'D) All of them'
+  ], ans:'D'},
+  {q: '128. In OSD, ................ responsible for Synchronization, replication, and Maintaining system coordination.', opts:[
+    'A) Internal Network',
+    'B) Storage',
+    'C) OSD nodes',
+    'D) Storage Pool'
+  ], ans:'A'},
+  {q: '129. In Metadata-Based Policies, ........... means How long data should be kept before deletion.', opts:[
+    'A) Retention Policy',
+    'B) Tiering Policy',
+    'C) Replication Policy',
+    'D) All of them'
+  ], ans:'A'},
+  {q: '130. In Metadata-Based Policies, ........... Duplicate data across multiple geographic regions for redundancy and disaster recovery.', opts:[
+    'A) Retention Policy',
+    'B) Tiering Policy',
+    'C) Replication Policy',
+    'D) All of them'
+  ], ans:'C'},
+  {q: '131. CAS is a specialized type of storage system to store fixed content or unchanging content, such as medical images, legal documents, emails, or backups.', opts:[
+    'A) True',
+    'B) False'
+  ], ans:'A'},
+  {q: '132. In CAS, Each piece of data is assigned ................ which is typically generated using a cryptographic hash function (like MD5 or SHA-1) derived directly from the data’s binary content.', opts:[
+    'A) CA',
+    'B) Content Address',
+    'C) unique identifier',
+    'D) All of them'
+  ], ans:'C'},
+  {q: '133. ............. is a storage system that supports both file-level and block-level access from the same storage platform.', opts:[
+    'A) Unified storage',
+    'B) Multiprotocol storage',
+    'C) A & B',
+    'D) None of them'
+  ], ans:'A'},
+  {q: '134. In Unified storage, ................. is the core control unit that manages all data operations and communication with the physical storage (disks).', opts:[
+    'A) Storage Controller',
+    'B) OSD Node',
+    'C) NAS Head',
+    'D) Storage Pool'
+  ], ans:'A'},
+
+  // Lec8
+  {q: '135. What is the main goal of Business Continuity (BC)?', opts:[
+    'A) To improve marketing strategies',
+    'B) To ensure business operations continue during disruptions',
+    'C) To reduce employee workload',
+    'D) To increase profit margins'
+  ], ans:'B'},
+  {q: '136. Which of the following is NOT a key parameter of Information Availability?', opts:[
+    'A) Reliability',
+    'B) Accessibility',
+    'C) Timeliness',
+    'D) Profitability'
+  ], ans:'D'},
+  {q: '137. Which of the following is considered an unplanned outage?', opts:[
+    'A) System maintenance',
+    'B) Backup process',
+    'C) Database corruption',
+    'D) Reporting jobs'
+  ], ans:'C'},
+  {q: '138. How is Information Availability (IA) calculated in terms of uptime and downtime?', opts:[
+    'A) IA = system downtime / (system uptime + system downtime)',
+    'B) IA = system uptime / (system uptime + system downtime)',
+    'C) IA = MTTR / MTBF',
+    'D) IA = total revenue / total cost'
+  ], ans:'B'},
+  {q: '139. What does MTBF stand for?', opts:[
+    'A) Maximum Time Before Failure',
+    'B) Mean Time Between Failures',
+    'C) Mean Time to Backup',
+    'D) Maximum Time Between Backups'
+  ], ans:'B'},
+  {q: '140. What does MTTR measure?', opts:[
+    'A) Time between system failures',
+    'B) Time to repair a failed component',
+    'C) Average downtime per week',
+    'D) Backup frequency'
+  ], ans:'B'},
+  {q: '141. Which formula calculates the average cost of downtime per hour?', opts:[
+    'A) Average revenue per week ÷ employees per week',
+    'B) Average productivity loss per hour + average revenue loss per hour',
+    'C) MTBF ÷ MTTR',
+    'D) Total revenue ÷ system uptime'
+  ], ans:'B'},
+  {q: '142. What is the difference between Disaster Recovery and Disaster Restart?', opts:[
+    'A) DR restores from backups, DRR uses replicated copies',
+    'B) DR uses replication, DRR uses backups',
+    'C) DR is only for hardware, DRR is only for software',
+    'D) DR and DRR are the same'
+  ], ans:'A'},
+  {q: '143. If the RPO is 1 hour, it means:', opts:[
+    'A) Systems must be restored within 1 hour',
+    'B) Data loss cannot exceed 1 hour',
+    'C) Backup is done every day',
+    'D) Maximum downtime is unlimited'
+  ], ans:'B'},
+  {q: '144. Recovery-Time Objective (RTO) defines:', opts:[
+    'A) Maximum acceptable downtime',
+    'B) Maximum data loss',
+    'C) Backup frequency',
+    'D) Storage replication speed'
+  ], ans:'A'},
+  {q: '145. Which of the following is a key task in BIA?', opts:[
+    'A) Designing marketing campaigns',
+    'B) Calculating maximum tolerable outage for each business process',
+    'C) Hiring employees',
+    'D) Installing operating systems'
+  ], ans:'B'},
+  {q: '146. What is a Single Point of Failure (SPOF)?', opts:[
+    'A) A component whose failure does not affect the system',
+    'B) A component whose failure can terminate the availability of the entire system',
+    'C) A backup server',
+    'D) A replicated storage array'
+  ], ans:'B'},
+  {q: '147. Which of the following is a fault-tolerance mechanism?', opts:[
+    'A) Server clustering',
+    'B) Marketing strategy',
+    'C) Profit calculation',
+    'D) Employee training'
+  ], ans:'A'},
+  {q: '148. Multipathing Software primarily improves:', opts:[
+    'A) Employee productivity',
+    'B) Data availability and I/O performance',
+    'C) Marketing efficiency',
+    'D) Profit margins'
+  ], ans:'B'},
+  {q: '149. Which of the following statements is correct?', opts:[
+    'A) Backup is always real-time replication',
+    'B) Replication ensures continuous access to data in near real-time',
+    'C) Recovery is only for hardware failures',
+    'D) Backup and replication are the same'
+  ], ans:'B'},
+
+  // Lec9
+  {q: '150. Which of the following best describes a backup?', opts:[
+    'A) Long-term data storage for compliance',
+    'B) A copy of production data used for recovery',
+    'C) An archive of historical records',
+    'D) Temporary cache for high-speed access'
+  ], ans:'B'},
+  {q: '151. Which backup type copies only the data changed since the last full or incremental backup?', opts:[
+    'A) Full backup',
+    'B) Incremental backup',
+    'C) Differential backup',
+    'D) PIT backup'
+  ], ans:'B'},
+  {q: '152. What is the main advantage of hot backups?', opts:[
+    'A) Maximum data consistency',
+    'B) No downtime for users',
+    'C) Simpler restore process',
+    'D) Minimal disk space usage'
+  ], ans:'B'},
+  {q: '153. Which backup method requires stopping the application to ensure consistency?', opts:[
+    'A) Hot backup',
+    'B) Cold backup',
+    'C) Incremental backup',
+    'D) NDMP 3-way backup'
+  ], ans:'B'},
+  {q: '154. What does PIT (Point-in-Time) backup achieve?', opts:[
+    'A) Continuous replication of data',
+    'B) Snapshot of data at a specific moment with minimal downtime',
+    'C) Full offline backup of the application',
+    'D) Archival of old files'
+  ], ans:'B'},
+  {q: '155. In a client-server backup architecture, the backup server is responsible for:', opts:[
+    'A) Collecting all production data directly',
+    'B) Managing backup operations and policies',
+    'C) Moving data to SAN storage without metadata',
+    'D) Installing operating systems'
+  ], ans:'B'},
+  {q: '156. Which topology offloads backup traffic from the LAN using SAN?', opts:[
+    'A) LAN-based backup',
+    'B) Mixed topology',
+    'C) SAN-based backup',
+    'D) Server-based backup'
+  ], ans:'C'},
+  {q: '157. Which NAS backup method bypasses the production server to reduce network load?', opts:[
+    'A) Server-based backup',
+    'B) Serverless backup',
+    'C) NDMP 2-way backup',
+    'D) NDMP 3-way backup'
+  ], ans:'B'},
+  {q: '158. End-to-end backup solution ensures:', opts:[
+    'A) Only local backups are performed',
+    'B) Protection from data collection to recovery for all systems',
+    'C) Archival of old data only',
+    'D) Backup exclusively to tape'
+  ], ans:'B'},
+  {q: '159. NDMP 3-way NAS backup allows:', opts:[
+    'A) All backup data to travel over LAN',
+    'B) Metadata over LAN and data over private backup network',
+    'C) Only full backups',
+    'D) NAS to Disk backup without metadata'
+  ], ans:'B'}
+];
+
+const quizDiv = document.getElementById('quiz');
+let currentQuestions = [...questions];
+
+function renderQuiz(){
+  quizDiv.innerHTML = '';
+  currentQuestions.forEach((item, idx) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q';
+    qDiv.id = 'q'+(idx+1);
+    const h = document.createElement('h3');
+    const questionText = item.q.replace(/^\d+\.\s*/, '');
+    h.textContent = (idx + 1) + '. ' + questionText;
+    qDiv.appendChild(h);
+
+    const optsDiv = document.createElement('div');
+    optsDiv.className = 'opts';
+
+    item.opts.forEach((opt, j)=>{
+      const label = document.createElement('label');
+      label.className = 'opt';
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'q'+idx;
+      radio.value = String.fromCharCode(65+j);
+      const span = document.createElement('span');
+      const cleanOpt = opt.replace(/^[A-D]\)\s*/, '');
+      span.textContent = String.fromCharCode(65+j) + ') ' + cleanOpt;
+      label.appendChild(radio);
+      label.appendChild(span);
+      optsDiv.appendChild(label);
+    });
+
+    qDiv.appendChild(optsDiv);
+    quizDiv.appendChild(qDiv);
+  });
+}
+
+function grade(){
+  let correct=0;
+  currentQuestions.forEach((item, idx)=>{
+    const selected = document.querySelector('input[name="q'+idx+'"]:checked');
+    const qElem = document.getElementById('q'+(idx+1));
+    qElem.classList.remove('correct','wrong');
+    qElem.querySelectorAll('.opt').forEach(l=>{l.style.opacity='1';});
+    if(selected){
+      const val = selected.value;
+      if(val === item.ans){
+        correct++;
+        qElem.classList.add('correct');
+      } else {
+        qElem.classList.add('wrong');
+        qElem.querySelectorAll('.opt').forEach(l=>{if(l.querySelector('input').checked) l.style.fontWeight='700';});
+      }
+    } else {
+      qElem.classList.add('wrong');
+    }
+    let ansText = document.createElement('div');
+    ansText.style.marginTop='8px';
+    ansText.style.fontSize='13px';
+    ansText.style.color='#0b1220';
+    ansText.innerHTML = '<small><strong>Correct answer: </strong>' + item.ans + '</small>';
+    const old = qElem.querySelector('.correctAnswer');
+    if(old) old.remove();
+    ansText.className='correctAnswer';
+    qElem.appendChild(ansText);
+  });
+
+  const total = currentQuestions.length;
+  const percent = Math.round((correct/total)*100);
+  const gradeLetter = percent>=90? 'A' : percent>=80? 'B' : percent>=70? 'C' : percent>=60? 'D' : 'F';
+
+  const summary = document.getElementById('summary');
+  summary.innerHTML = '<div class="result"><div class="score">Score: '+correct+' / '+total+' ('+percent+'%) — Grade: '+gradeLetter+'</div>'+
+                      '<div style="margin-top:8px"><small>Correct: '+correct+' — Wrong/Unanswered: '+(total-correct)+'</small></div></div>';
+  summary.scrollIntoView({behavior:'smooth'});
+}
+
+function resetQuiz(){
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+  document.querySelectorAll('.q').forEach(q=>{
+    q.classList.remove('correct','wrong');
+    const ca = q.querySelector('.correctAnswer'); if(ca) ca.remove();
+    q.querySelectorAll('.opt').forEach(l=>{l.style.fontWeight='400';l.style.opacity='1'});
+  });
+  document.getElementById('summary').innerHTML='';
+}
+
+function shuffleQuestions(){
+  resetQuiz();
+  currentQuestions = [...questions];
+  for(let i = currentQuestions.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [currentQuestions[i], currentQuestions[j]] = [currentQuestions[j], currentQuestions[i]];
+  }
+
+  currentQuestions = currentQuestions.map(q => {
+    if (q.opts.length === 2 && q.opts[0].includes('True') && q.opts[1].includes('False')) {
+      return q;
+    }
+    if (q.fixed === true) {
+      return q;
+    }
+    const newQ = {...q};
+
+    const optionsWithLetters = newQ.opts.map((opt, idx) => ({
+      text: opt,
+      originalLetter: String.fromCharCode(65 + idx)
+    }));
+
+    for (let i = optionsWithLetters.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [optionsWithLetters[i], optionsWithLetters[j]] = [optionsWithLetters[j], optionsWithLetters[i]];
+    }
+
+    newQ.opts = optionsWithLetters.map(item => item.text);
+
+    const correctAnswerIndex = optionsWithLetters.findIndex(
+      item => item.originalLetter === newQ.ans
+    );
+    newQ.ans = String.fromCharCode(65 + correctAnswerIndex);
+
+    return newQ;
+  });
+
+  renderQuiz();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+renderQuiz();
+
+document.getElementById('submitBtn').addEventListener('click', grade);
+document.getElementById('resetBtn').addEventListener('click', resetQuiz);
+document.getElementById('shuffleBtn').addEventListener('click', shuffleQuestions);
+
+</script>
+</body>
+</html>
